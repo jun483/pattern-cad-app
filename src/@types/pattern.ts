@@ -5,6 +5,17 @@ export type UnitType = "mm" | "cm" | "inch";
 
 export type CornerType = "right-angle" | "mitered" | "folded";
 
+export interface Point2D {
+  x: number;
+  y: number;
+}
+
+export interface CalculatedPart {
+  name: string;
+  outline: Point2D[];
+  seamAllowance?: number;
+}
+
 export interface SeamAllowanceConfig {
   enabled: boolean;
   width: number;
@@ -15,20 +26,20 @@ export type NotchType = "v-shape" | "slit" | "hole" | "cross";
 
 export interface Notch {
   id: string;
-  position: { x: number; y: number };
+  position: Point2D;
   type: NotchType;
   label?: string;
 }
 
 export interface GrainLine {
-  start: { x: number; y: number };
-  end: { x: number; y: number };
+  start: Point2D;
+  end: Point2D;
 }
 
 export interface PatternPart {
   id: string;
   name: string;
-  outline: Array<{ x: number; y: number }>;
+  outline: Point2D[];
   notches: Notch[];
   seamAllowance: SeamAllowanceConfig;
   grainLine: GrainLine;

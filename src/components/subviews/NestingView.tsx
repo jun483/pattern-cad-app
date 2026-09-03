@@ -1,207 +1,145 @@
-import { useState, useMemo } from "react";
+// src/components/subviews/NestingView.tsx
+import React from "react";
 import { useUIStore } from "../../store/useUIStore";
 
-const translations = {
-  ja: {
-    title: "自動用尺・効率ネスティング (Automated Nesting & Layout)",
-    langLabel: "言語",
-    selectedItem: "選択アイテム",
-    statusReady: "パーツ配置最適化アルゴリズム：スタンバイ完了",
-    efficiencyLabel: "想定用尺効率 (Fabric Utilization):",
-    fabricWidthLabel: "生地幅設定 (Fabric Width)",
-    marginLabel: "縫い代・マージン (Seam Allowance)",
-    btnOptimize: "⚡ 自動ネスティング最適化を実行",
-    btnExport: "📥 配置済みCADレイアウト出力 (.dxf / .pdf)",
-    note: "✨ 生地幅と用尺ロスを最小限に抑えるよう、自動でパーツを最適配置します。",
-    simOptimize:
-      "自動ネスティングの最適化計算を実行しました（シミュレーション）",
-    simExport: "レイアウトデータをエクスポートしました（シミュレーション）",
-  },
-  en: {
-    title: "Automated Nesting & Layout",
-    langLabel: "Language",
-    selectedItem: "Selected Item",
-    statusReady: "Part Placement Optimization Algorithm: Ready",
-    efficiencyLabel: "Estimated Fabric Utilization:",
-    fabricWidthLabel: "Fabric Width",
-    marginLabel: "Seam Allowance & Margin",
-    btnOptimize: "⚡ Run Auto-Nesting Optimization",
-    btnExport: "📥 Export Placed Layout (.dxf / .pdf)",
-    note: "✨ Automatically optimizes part placement to minimize fabric width and waste.",
-    simOptimize: "Executed auto-nesting optimization calculation (Simulation)",
-    simExport: "Exported layout data (Simulation)",
-  },
-  fr: {
-    title: "Nécessaire & Placement Automatique",
-    langLabel: "Langue",
-    selectedItem: "Article",
-    statusReady: "Algorithme d'optimisation de placement : Prêt",
-    efficiencyLabel: "Efficacité estimée du tissu :",
-    fabricWidthLabel: "Laize du tissu",
-    marginLabel: "Marge de couture",
-    btnOptimize: "⚡ Exécuter l'optimisation automatique",
-    btnExport: "📥 Exporter la disposition (.dxf / .pdf)",
-    note: "✨ Optimise automatiquement le placement pour réduire les chutes.",
-    simOptimize: "Calcul d'optimisation de placement exécuté (Simulation)",
-    simExport: "Données de disposition exportées (Simulation)",
-  },
-  zh: {
-    title: "自动排料与优化排版 (Automated Nesting & Layout)",
-    langLabel: "语言",
-    selectedItem: "选中项目",
-    statusReady: "零件放置优化算法：就绪",
-    efficiencyLabel: "预计面料利用率：",
-    fabricWidthLabel: "面料幅宽设置",
-    marginLabel: "缝份与间距",
-    btnOptimize: "⚡ 运行自动排料优化",
-    btnExport: "📥 导出排版布局 (.dxf / .pdf)",
-    note: "✨ 自动优化部件排版，最大限度减少面料损耗与幅宽浪费。",
-    simOptimize: "已执行自动排料优化计算（模拟）",
-    simExport: "已导出排版布局数据（模拟）",
-  },
-} as const;
+export const NestingView: React.FC = () => {
+  const { sewingMachineType, locale } = useUIStore();
 
-type LangKey = keyof typeof translations;
-
-export default function NestingView() {
-  const {
-    currentLanguage,
-    activeCategory,
-    measurements,
-    fabricStretch,
-    unitSystem,
-  } = useUIStore();
-
-  const [fabricWidth, setFabricWidth] = useState<number>(110); // cm
-  const [seamAllowance, setSeamAllowance] = useState<number>(1.5); // cm
-  const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
-
-  const langKey: LangKey = (
-    currentLanguage in translations ? currentLanguage : "ja"
-  ) as LangKey;
-  const t = translations[langKey];
-
-  // 用尺効率の動的計算ロジック
-  const calculatedEfficiency = useMemo(() => {
-    const base = 85;
-    const stretchBonus =
-      (fabricStretch.hStretch + fabricStretch.vStretch) * 0.05;
-    const sizeFactor = measurements.bust * 0.02;
-    const total = Math.min(96, Math.max(72, base + stretchBonus - sizeFactor));
-    return total.toFixed(1);
-  }, [fabricStretch, measurements]);
-
-  const handleRunOptimization = () => {
-    setIsOptimizing(true);
-    setTimeout(() => {
-      setIsOptimizing(false);
-      alert(t.simOptimize);
-    }, 600);
+  // 言語ごとのテキスト定義
+  const labels = {
+    ja: {
+      tag: "SUBVIEW: AUTO NESTING & LAYOUT",
+      title: "自動ネスティング（生地配置・用尺計算）",
+      seamMode: "縫い代モード：",
+      industrial: "⚙️ 工業用 (パーツ別最適化)",
+      standard: "🏠 家庭用 (一律縫い代)",
+      cardTitle: "AIパーツ自動配置 & 用尺計算エンジン",
+      cardDesc:
+        "生地巾（110cm / 150cm等）に合わせて、すべてのパターンピースを隙間なくパッキングし、無駄のない用尺（必要用尺：約 1.8m）を瞬時に算出します。",
+      executeBtn: "ネスティング最適化を実行",
+      widthBtn: "生地巾変更 (110cm)",
+    },
+    en: {
+      tag: "SUBVIEW: AUTO NESTING & LAYOUT",
+      title: "Auto Nesting & Fabric Layout Calculation",
+      seamMode: "Seam Allowance Mode:",
+      industrial: "⚙️ Industrial (Part-optimized)",
+      standard: "🏠 Standard (Uniform allowance)",
+      cardTitle: "AI Part Auto-Placement & Yardage Engine",
+      cardDesc:
+        "Optimally packs all pattern pieces according to fabric width (e.g., 110cm / 150cm) to instantly calculate the precise yardage required (approx. 1.8m).",
+      executeBtn: "Run Nesting Optimization",
+      widthBtn: "Change Fabric Width (110cm)",
+    },
+    fr: {
+      tag: "SOUS-MODULE : IMBESTAGE AUTOMATIQUE & MISE EN PAGE",
+      title: "Imbéstage automatique et calcul de métrage",
+      seamMode: "Mode de couture :",
+      industrial: "⚙️ Industriel (Optimisé par pièce)",
+      standard: "🏠 Standard (Marge uniforme)",
+      cardTitle: "Moteur IA de placement et de métrage",
+      cardDesc:
+        "Place optimalement toutes les pièces selon la largeur du tissu pour calculer instantanément le métrage requis (env. 1.8m).",
+      executeBtn: "Exécuter l'optimisation",
+      widthBtn: "Modifier la largeur (110cm)",
+    },
+    es: {
+      tag: "SUBVISTA: ANIDAMIENTO AUTOMÁTICO Y DISEÑO",
+      title: "Anidamiento Automático y Cálculo de Metraje",
+      seamMode: "Modo de margen de costura:",
+      industrial: "⚙️ Industrial (Optimizado por pieza)",
+      standard: "🏠 Estándar (Margen uniforme)",
+      cardTitle: "Motor de Colocación Automática y Metraje IA",
+      cardDesc:
+        "Empaqueta de forma óptima todas las piezas según el ancho de la tela para calcular al instante el metraje preciso (aprox. 1.8m).",
+      executeBtn: "Ejecutar Optimización",
+      widthBtn: "Cambiar Ancho de Tela (110cm)",
+    },
+    zh: {
+      tag: "子视图: 自动排料与布料布局",
+      title: "自动排料（面料排版与用料计算）",
+      seamMode: "缝份模式：",
+      industrial: "⚙️ 工业用 (部件独立优化)",
+      standard: "🏠 家用 (统一缝份)",
+      cardTitle: "AI 部件自动排版与用料计算引擎",
+      cardDesc:
+        "根据面料幅宽（110cm / 150cm等）无缝排布所有样片，瞬时计算出最优用料（所需用料：约 1.8m）。",
+      executeBtn: "运行排料优化",
+      widthBtn: "更改幅宽 (110cm)",
+    },
+    ko: {
+      tag: "하위뷰: 자동 네스팅 및 레이아웃",
+      title: "자동 네스팅 (원단 배치 및 소요량 계산)",
+      seamMode: "시로(시봉) 모드:",
+      industrial: "⚙️ 산업용 (부위별 최적화)",
+      standard: "🏠 가정용 (일률적 시접)",
+      cardTitle: "AI 패턴 자동 배치 & 소요량 계산 엔진",
+      cardDesc:
+        "원단 폭(110cm / 150cm 등)에 맞춰 모든 패턴 조각을 틈새 없이 패킹하여, 낭비 없는 소요량(필요 소요량: 약 1.8m)을 즉시 산출합니다.",
+      executeBtn: "네스팅 최적화 실행",
+      widthBtn: "원단 폭 변경 (110cm)",
+    },
   };
 
+  const tText = labels[locale as keyof typeof labels] || labels.en;
+
   return (
-    <div className="flex flex-col h-full bg-gray-50 p-6 overflow-y-auto space-y-6">
-      {/* ヘッダーコントロール */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+    <div className="bg-[#111827] rounded-xl p-6 shadow-2xl border border-[#1f2937] flex flex-col gap-6 text-slate-200 min-h-[500px]">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[#1f2937] pb-4 gap-2">
         <div>
-          <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
-            <span>📐</span> {t.title}
+          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded uppercase tracking-wider">
+            {tText.tag}
+          </span>
+          <h2 className="text-base font-bold text-slate-100 mt-1.5 flex items-center gap-2">
+            <span>📦 {tText.title}</span>
+            <span className="text-xs px-2 py-0.5 rounded bg-[#1f2937] text-emerald-400 border border-slate-700">
+              Optimization: Active
+            </span>
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {t.langLabel}:{" "}
-            <strong className="uppercase text-amber-700">
-              {currentLanguage}
-            </strong>{" "}
-            | {t.selectedItem}:{" "}
-            <strong className="text-blue-700">{activeCategory}</strong>
-          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs px-3 py-1 bg-blue-50 text-blue-800 font-semibold rounded-full border border-blue-200 uppercase">
-            {unitSystem}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-slate-400">{tText.seamMode}</span>
+          <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold">
+            {sewingMachineType === "industrial"
+              ? tText.industrial
+              : tText.standard}
           </span>
         </div>
       </div>
 
-      {/* メインレイアウトシミュレーターステージ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 左側：パラメータ制御パネル */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
-          <h3 className="text-sm font-bold text-gray-800 border-b pb-2">
-            ⚙️ プレースメント設定
-          </h3>
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-gray-600 block mb-1">
-                {t.fabricWidthLabel} ({unitSystem})
-              </label>
-              <input
-                type="number"
-                value={fabricWidth}
-                onChange={(e) => setFabricWidth(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-gray-600 block mb-1">
-                {t.marginLabel} ({unitSystem})
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                value={seamAllowance}
-                onChange={(e) => setSeamAllowance(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+      {/* ネスティングプレビューエリア */}
+      <div className="relative flex-1 bg-[#0b0f19] rounded-xl border border-[#1f2937] flex items-center justify-center overflow-hidden p-8 shadow-inner min-h-[350px]">
+        {/* 布地の反物風グリッドライン */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98110_1px,transparent_1px),linear-gradient(to_bottom,#10b98110_1px,transparent_1px)] bg-[size:32px_32px]" />
 
-          <div className="pt-4 border-t">
-            <div className="text-xs text-gray-500 mb-1">
-              {t.efficiencyLabel}
-            </div>
-            <div className="text-2xl font-black text-emerald-600">
-              {calculatedEfficiency}%
-            </div>
+        <div className="relative z-10 flex flex-col items-center gap-4 text-center max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+            📐
           </div>
-        </div>
-
-        {/* 右側：キャンバスプレビューとアクション */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col justify-between items-center space-y-6 text-center">
-          <div className="w-full flex-1 min-h-[220px] bg-slate-900 text-slate-300 rounded-xl flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-inner border border-slate-800">
-            <div className="absolute top-3 left-3 text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400">
-              {t.statusReady}
-            </div>
-            <div className="text-4xl mb-2">🧵</div>
-            <div className="text-xs text-slate-400">
-              Active Category:{" "}
-              <span className="text-amber-400 font-bold">{activeCategory}</span>{" "}
-              (Width: {fabricWidth}
-              {unitSystem})
-            </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-200">
+              {tText.cardTitle}
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">{tText.cardDesc}</p>
           </div>
-
-          <div className="flex flex-wrap justify-center gap-3 w-full pt-2">
+          <div className="flex gap-2 mt-2">
             <button
-              onClick={handleRunOptimization}
-              disabled={isOptimizing}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
+              onClick={() => alert("Nesting Optimization Started")}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-all shadow-lg shadow-emerald-600/20"
             >
-              {isOptimizing ? "計算中..." : t.btnOptimize}
+              {tText.executeBtn}
             </button>
             <button
-              onClick={() => alert(t.simExport)}
-              className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl border border-gray-300 transition-all"
+              onClick={() => alert("Fabric Width Changed")}
+              className="px-4 py-2 bg-[#1f2937] hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition-all border border-slate-700"
             >
-              {t.btnExport}
+              {tText.widthBtn}
             </button>
-          </div>
-
-          <div className="text-[11px] text-gray-400 pt-3 border-t border-gray-100 w-full text-left">
-            {t.note}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default NestingView;

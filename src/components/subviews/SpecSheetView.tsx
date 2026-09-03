@@ -1,180 +1,271 @@
 // src/components/subviews/SpecSheetView.tsx
-import { useState } from "react";
+//仕様書・縫製レシピビュー
+import React from "react";
 import { useUIStore } from "../../store/useUIStore";
-import { useTranslation } from "../../i18n/dictionary";
 
-export default function SpecSheetView() {
-  // ストアと翻訳フックを安全に取得
-  const store = useUIStore() as any;
-  const currentLanguage = (store?.currentLanguage ||
-    store?.language ||
-    "ja") as string;
+// 翻訳データの型定義を明確化
+interface TranslationType {
+  tag: string;
+  title: string;
+  sewingSpec: string;
+  industrial: string;
+  standard: string;
+  storeName: string;
+  storeDesc: string;
+  downloadBtn: string;
+  section1: string;
+  bust: string;
+  waist: string;
+  hip: string;
+  backLength: string;
+  section2: string;
+  interlining: string;
+  thread: string;
+  sewingAllowance: string;
+  seamInd: string;
+  seamStd: string;
+}
 
-  // 型エラーを回避するため一度 unknown を経由してオブジェクトに変換
-  const rawT = useTranslation(currentLanguage as any);
-  const t = rawT as unknown as Record<string, string>;
+export const SpecSheetView: React.FC = () => {
+  const measurements = useUIStore((state) => state.measurements);
+  const sewingMachineType = useUIStore((state) => state.sewingMachineType);
+  const locale = useUIStore((state) => state.locale);
 
-  const [itemName, setItemName] = useState("スタンダード レッスンバッグ");
-  const [fabric, setFabric] = useState("オックスフォードコットン / 接着芯地");
-  const [thread, setThread] = useState("シャッペスパン 60番");
+  // 言語ごとのテキスト定義
+  const labels: Record<string, TranslationType> = {
+    ja: {
+      tag: "SUBVIEW: SPEC SHEET & SEWING RECIPE",
+      title: "仕様書・縫製レシピ自動生成",
+      sewingSpec: "縫製仕様：",
+      industrial: "⚙️ 工業用アパレル縫製手順",
+      standard: "🏠 家庭用ミシン向け手順書",
+      storeName: "小田原ミシン - 製品仕様書 (PRODUCTION SPEC SHEET)",
+      storeDesc: "現在の採寸・物性データに基づき自動生成された公式レシピ",
+      downloadBtn: "PDF形式でダウンロード",
+      section1: "1. 適用サイズ・採寸データ",
+      bust: "バスト:",
+      waist: "ウエスト:",
+      hip: "ヒップ:",
+      backLength: "背丈:",
+      section2: "2. 推奨副資材 & 縫製ノート",
+      interlining: "接着芯: 薄手平織り芯地 (見返し・襟元補強)",
+      thread: "ミシン糸: スパン糸 #60 (カラー: ブレンドゴールド)",
+      sewingAllowance: "縫い代仕様:",
+      seamInd: "部分別最適化 (本縫い+ロック)",
+      seamStd: "一律 1.0cm ロック始末",
+    },
+    en: {
+      tag: "SUBVIEW: SPEC SHEET & SEWING RECIPE",
+      title: "Spec Sheet & Sewing Recipe Generator",
+      sewingSpec: "Sewing Spec:",
+      industrial: "⚙️ Industrial Apparel Procedure",
+      standard: "🏠 Home Sewing Machine Guide",
+      storeName: "Odawara Sewing Machine - Production Spec Sheet",
+      storeDesc:
+        "Official recipe auto-generated based on current measurements and property data",
+      downloadBtn: "Download as PDF",
+      section1: "1. Applicable Sizes & Measurements",
+      bust: "Bust:",
+      waist: "Waist:",
+      hip: "Hip:",
+      backLength: "Back Length:",
+      section2: "2. Recommended Notions & Sewing Notes",
+      interlining:
+        "Interlining: Lightweight plain weave (facing & collar reinforcement)",
+      thread: "Thread: Spun thread #60 (Color: Blend Gold)",
+      sewingAllowance: "Seam Allowance:",
+      seamInd: "Part-optimized (Lockstitch + Overlock)",
+      seamStd: "Uniform 1.0cm Overlock finish",
+    },
+    fr: {
+      tag: "SOUS-MODULE : FICHE TECHNIQUE & RECETTE",
+      title: "Générateur de fiche technique et de couture",
+      sewingSpec: "Spécification :",
+      industrial: "⚙️ Procédure industrielle",
+      standard: "🏠 Guide machine familiale",
+      storeName: "Odawara Sewing - Fiche technique de production",
+      storeDesc:
+        "Recette officielle générée automatiquement selon les mesures actuelles",
+      downloadBtn: "Télécharger en PDF",
+      section1: "1. Tailles applicables et mesures",
+      bust: "Poitrine:",
+      waist: "Taille:",
+      hip: "Hanches:",
+      backLength: "Longueur dos:",
+      section2: "2. Fournitures recommandées & Notes",
+      interlining: "Entoilage : Tissé léger (renfort parementure / col)",
+      thread: "Fil : Fil spun #60 (Couleur : Or mélangé)",
+      sewingAllowance: "Marge de couture :",
+      seamInd: "Optimisé par pièce (Piqûre + Surjet)",
+      seamStd: "Marge uniforme 1.0cm surjet",
+    },
+    es: {
+      tag: "SUBVISTA: HOJA DE ESPECIFICACIONES Y RECETA",
+      title: "Generador de Hoja de Especificaciones y Costura",
+      sewingSpec: "Especificación:",
+      industrial: "⚙️ Procedimiento industrial",
+      standard: "🏠 Guía para máquina doméstica",
+      storeName: "Odawara Sewing - Hoja de Especificaciones de Producción",
+      storeDesc:
+        "Receta oficial generada automáticamente según las medidas y datos actuales",
+      downloadBtn: "Descargar en PDF",
+      section1: "1. Tallas aplicables y medidas",
+      bust: "Busto:",
+      waist: "Cintura:",
+      hip: "Cadera:",
+      backLength: "Largo de espalda:",
+      section2: "2. Insumos recomendados y notas",
+      interlining:
+        "Entretela: Tejido plano ligero (refuerzo de vistas y cuello)",
+      thread: "Hilo: Hilo spun #60 (Color: Oro mezclado)",
+      sewingAllowance: "Margen de costura:",
+      seamInd: "Optimizado por pieza (Punteado + Overlock)",
+      seamStd: "Margen uniforme de 1.0cm",
+    },
+    zh: {
+      tag: "子视图: 规格书与缝制工艺单",
+      title: "规格书与缝制工艺单自动生成",
+      sewingSpec: "缝制规范：",
+      industrial: "⚙️ 工业服装缝制流程",
+      standard: "🏠 家用缝纫机制作指南",
+      storeName: "小田原缝纫 - 产品规格书 (PRODUCTION SPEC SHEET)",
+      storeDesc: "基于当前尺寸与物性数据自动生成的官方工艺单",
+      downloadBtn: "下载 PDF 格式",
+      section1: "1. 适用尺寸与测量数据",
+      bust: "胸围:",
+      waist: "腰围:",
+      hip: "臀围:",
+      backLength: "背长:",
+      section2: "2. 推荐辅料与缝制说明",
+      interlining: "粘合衬: 轻薄平纹衬 (门襟与领口加固)",
+      thread: "缝纫线: 涤纶 spun #60 (颜色: 混合金)",
+      sewingAllowance: "缝份规格:",
+      seamInd: "部件独立优化 (平缝+包缝)",
+      seamStd: "统一 1.0cm 包边处理",
+    },
+    ko: {
+      tag: "하위뷰: 사양서 및 봉제 레시피",
+      title: "사양서 및 봉제 레시피 자동 생성",
+      sewingSpec: "봉제 사양:",
+      industrial: "⚙️ 산업용 어패럴 봉제 순서",
+      standard: "🏠 가정용 미싱용 지침서",
+      storeName: "오다와라 미싱 - 제품 사양서 (PRODUCTION SPEC SHEET)",
+      storeDesc: "현재 치수 및 물성 데이터를 기반으로 자동 생성된 공식 레시피",
+      downloadBtn: "PDF 형식으로 다운로드",
+      section1: "1. 적용 사이즈 및 치수 데이터",
+      bust: "바스트:",
+      waist: "웨이스트:",
+      hip: "힙:",
+      backLength: "뒤등길이:",
+      section2: "2. 추천 부자재 & 봉제 노트",
+      interlining: "접착심: 얇은 평직 심지 (안단 및 깃 보강)",
+      thread: "미싱실: 스판실 #60 (컬러: 블렌드 골드)",
+      sewingAllowance: "시접 사양:",
+      seamInd: "부위별 최적화 (본봉+오버록)",
+      seamStd: "일률 1.0cm 오버록 마감",
+    },
+  };
+
+  const tText = labels[locale] || labels.en;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 text-gray-200 pb-32">
-      {/* ヘルパー・アクションバー */}
-      <div className="bg-gray-800/80 border border-gray-700/80 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="bg-[#111827] rounded-xl p-6 shadow-2xl border border-[#1f2937] flex flex-col gap-6 text-slate-200 min-h-[500px]">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[#1f2937] pb-4 gap-2">
         <div>
-          <h2 className="text-xl font-bold text-amber-400 flex items-center gap-2">
-            <span>📋</span> {t.specSheetTitle || "縫製仕様書 (Spec Sheet)"}
+          <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded uppercase tracking-wider">
+            {tText.tag}
+          </span>
+          <h2 className="text-base font-bold text-slate-100 mt-1.5 flex items-center gap-2">
+            <span>📜 {tText.title}</span>
+            <span className="text-xs px-2 py-0.5 rounded bg-[#1f2937] text-amber-400 border border-slate-700">
+              Professional Grade
+            </span>
           </h2>
-          <p className="text-xs text-gray-400 mt-1">
-            {t.specSheetSub ||
-              "自動計算されたパターンデータに基づく仕様書と縫製手順"}
-          </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-xs font-semibold rounded-xl transition-colors border border-gray-600">
-            {t.recalculateBtn || "再計算実行"}
-          </button>
-          <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-xs font-semibold rounded-xl transition-colors border border-gray-600">
-            {t.generateBtn || "CAD図面生成"}
-          </button>
-          <button className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-amber-900/30 transition-all flex items-center gap-1.5">
-            <span>🖨️</span> {t.printPdfBtn || "PDF出力 / 印刷"}
-          </button>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-slate-400">{tText.sewingSpec}</span>
+          <span className="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-semibold">
+            {sewingMachineType === "industrial"
+              ? tText.industrial
+              : tText.standard}
+          </span>
         </div>
       </div>
 
-      {/* 仕様書カード本体 */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-        {/* 基本情報グリッド */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-800">
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-              {t.itemNameLabel || "アイテム名"}
-            </label>
-            <input
-              type="text"
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-              className="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-            />
+      {/* 仕様書プレビューエリア */}
+      <div className="relative flex-1 bg-[#161e2e] rounded-xl border border-[#1f2937] p-6 shadow-inner flex flex-col gap-6">
+        <div className="flex justify-between items-center border-b border-[#1f2937] pb-4">
+          <div>
+            <h3 className="text-sm font-bold text-amber-400 tracking-wide">
+              {tText.storeName}
+            </h3>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              {tText.storeDesc}
+            </p>
           </div>
+          <button
+            onClick={() => alert("PDF Downloaded")}
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-[#0b0f19] text-xs font-bold rounded-lg transition-all shadow-lg shadow-amber-500/20"
+          >
+            {tText.downloadBtn}
+          </button>
+        </div>
 
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-              {t.fabricLabel || "表地・副資材"}
-            </label>
-            <input
-              type="text"
-              value={fabric}
-              onChange={(e) => setFabric(e.target.value)}
-              className="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-              {t.threadLabel || "推奨ミシン糸"}
-            </label>
-            <input
-              type="text"
-              value={thread}
-              onChange={(e) => setThread(e.target.value)}
-              className="w-full bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-            />
-          </div>
-
-          <div className="space-y-1 flex flex-col justify-end">
-            <span className="text-[11px] font-mono text-gray-400">
-              {t.modeUnitLabel || "単位: mm (縫い代込み)"}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+          {/* 基本寸法サマリー */}
+          <div className="bg-[#0b0f19] p-4 rounded-lg border border-[#1f2937] flex flex-col gap-3">
+            <span className="font-bold text-slate-300 border-b border-[#1f2937] pb-2">
+              {tText.section1}
             </span>
-          </div>
-        </div>
 
-        {/* 裁断パーツ一覧テーブル */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider">
-            {t.cuttingPartsTitle || "裁断パーツ一覧 (Cutting Parts)"}
-          </h3>
-          <div className="overflow-x-auto rounded-xl border border-gray-800">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-gray-800/80 text-gray-400 uppercase font-mono text-[10px]">
-                <tr>
-                  <th className="px-4 py-3">
-                    {t.tablePartName || "パーツ名称"}
-                  </th>
-                  <th className="px-4 py-3">{t.tableQty || "数量"}</th>
-                  <th className="px-4 py-3">{t.tableMaterial || "使用生地"}</th>
-                  <th className="px-4 py-3">
-                    {t.tableSeamAllowance || "縫い代"}
-                  </th>
-                  <th className="px-4 py-3">{t.tableNotes || "備考・仕様"}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800 text-gray-300">
-                <tr className="hover:bg-gray-800/40">
-                  <td className="px-4 py-3 font-medium">
-                    本体生地 {/* cspell:disable-line */}
-                  </td>
-                  <td className="px-4 py-3">2 枚 (表裏)</td>
-                  <td className="px-4 py-3">{fabric}</td>
-                  <td className="px-4 py-3">10 mm</td>
-                  <td className="px-4 py-3 text-gray-400">
-                    わ裁ち / 接着芯地貼付
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-800/40">
-                  <td className="px-4 py-3 font-medium">
-                    持ち手 {/* cspell:disable-line */}
-                  </td>
-                  <td className="px-4 py-3">2 本</td>
-                  <td className="px-4 py-3">アクリルテープ</td>
-                  <td className="px-4 py-3">-</td>
-                  <td className="px-4 py-3 text-gray-400">
-                    長さ 30cm / 補強ステッチ
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="grid grid-cols-2 gap-2 text-slate-400">
+              <div>
+                {tText.bust}{" "}
+                <span className="text-amber-400 font-semibold">
+                  {measurements.bust} cm
+                </span>
+              </div>
+              <div>
+                {tText.waist}{" "}
+                <span className="text-amber-400 font-semibold">
+                  {measurements.waist} cm
+                </span>
+              </div>
+              <div>
+                {tText.hip}{" "}
+                <span className="text-amber-400 font-semibold">
+                  {measurements.hip} cm
+                </span>
+              </div>
+              <div>
+                {tText.backLength}{" "}
+                <span className="text-amber-400 font-semibold">
+                  {measurements.backLength || 40} cm
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* 縫製レシピセクション */}
-        <div className="space-y-4 pt-4 border-t border-gray-800">
-          <h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider">
-            {t.recipeTitle || "縫製手順・レシピ (Sewing Recipe)"}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
-              <h4 className="font-bold text-xs text-amber-300">
-                {t.step01Title || "1. 裁断と芯貼り"}
-              </h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                {t.step01Desc ||
-                  "指定の寸法通りに生地を裁断し、必要に応じて接着芯地をアイロンでしっかりと貼り付けます。"}
-              </p>
-            </div>
-            <div className="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
-              <h4 className="font-bold text-xs text-amber-300">
-                {t.step02Title || "2. ポケット・持ち手の縫製"}
-              </h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                {t.step02Desc ||
-                  "持ち手を本体の規定位置に仮止めし、ポケットがある場合は端を折り返してステッチをかけます。"}
-              </p>
-            </div>
-            <div className="bg-gray-950 p-4 rounded-xl border border-gray-800 space-y-2">
-              <h4 className="font-bold text-xs text-amber-300">
-                {t.step03Title || "3. 本体組み立てと仕上げ"}
-              </h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                {t.step03Desc ||
-                  "中表に合わせて脇を縫製し、返し口から表に返してアイロンで整え、トップステッチで仕上げます。"}
-              </p>
-            </div>
+          {/* 副資材・縫製メモ */}
+          <div className="bg-[#0b0f19] p-4 rounded-lg border border-[#1f2937] flex flex-col gap-3">
+            <span className="font-bold text-slate-300 border-b border-[#1f2937] pb-2">
+              {tText.section2}
+            </span>
+            <ul className="list-disc list-inside text-slate-400 space-y-1">
+              <li>{tText.interlining}</li>
+              <li>{tText.thread}</li>
+              <li>
+                {tText.sewingAllowance}{" "}
+                {sewingMachineType === "industrial"
+                  ? tText.seamInd
+                  : tText.seamStd}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SpecSheetView;

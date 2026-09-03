@@ -1,215 +1,236 @@
 // src/App.tsx
-import React from "react";
+import { useState } from "react";
 import { useUIStore } from "./store/useUIStore";
-import Canvas2DView from "./components/subviews/Canvas2DView";
-import type { UIState, ModuleId } from "./@types/ui";
+import { dictionaries } from "./i18n";
+
+// ヘッダーコンポーネントのインポート
+import { HeaderControls } from "./components/HeaderControls";
+
+// 各種パネルのインポート
+import { MeasurementPanel } from "./components/panels/MeasurementPanel";
+import { FabricStretchPanel } from "./components/panels/FabricStretchPanel";
+import { SewingModePanel } from "./components/panels/SewingModePanel";
+
+// 各種サブビューのインポート
+import { Canvas2DView } from "./components/subviews/Canvas2DView";
+import { Simulation3DView } from "./components/subviews/Simulation3DView";
+import { NestingView } from "./components/subviews/NestingView";
+import { SpecSheetView } from "./components/subviews/SpecSheetView";
+import { DxfExporterView } from "./components/subviews/DxfExporterView";
+import { PdfGeneratorView } from "./components/subviews/PdfGeneratorView";
 
 export function App() {
-  const store = useUIStore();
-  const activeModule = useUIStore((state: UIState) => state.activeModule);
-  const userMode = useUIStore((state: UIState) => state.userMode);
-  const unitSystem = useUIStore((state: UIState) => state.unitSystem);
-  const locale = useUIStore((state: UIState) => state.locale || "ja");
+  const locale = useUIStore((state) => state.locale) || "ja";
+  const activeCategory = useUIStore((state) => state.activeCategory);
+  const setActiveCategory = useUIStore((state) => state.setActiveCategory);
 
-  // 1. トップナビゲーション（モジュール切替タブ）
-  const tabs: { id: ModuleId; label: string }[] = [
-    { id: "tabCanvas2D", label: "🎬 Canvas 2D / 自由描画" },
-    { id: "mod-viewer-3d", label: "🎥 3D シミュレーション・着せ替え" },
-    { id: "mod-nesting", label: "🎞️ 自動ネスティング" },
-    { id: "mod-spec-sheet", label: "📜 仕様書・縫製レシピ" },
-    { id: "mod-dxf-exporter", label: "📐 DXF 入出力 (CAD)" },
-    { id: "mod-pdf-generator", label: "🖨️ PDF 印刷・エクスポート" },
-  ];
+  // 現在の言語の辞書を取得（存在しない場合は日本語にフォールバック）
+  const t =
+    dictionaries[locale as keyof typeof dictionaries] || dictionaries["ja"];
 
-  // 2. 対応カテゴリ（人間・ドール・ペット・コスプレ・自由）
-  const categories = [
-    { id: "men_shirt", name: "人間用アパレル", sub: "シャツ・パンツ・原型" },
-    {
-      id: "doll_dress",
-      name: "ドール服 (Doll CAD)",
-      sub: "1/6, 1/3スケール対応",
+  // アクティブなタブの状態管理
+  const [activeTab, setActiveTab] = useState<string>("canvas2d");
+
+  // 言語ごとのカテゴリ名リスト（全言語完全対応）
+  const categoryLabels: Record<string, Record<string, string>> = {
+    human: {
+      ja: "人間用",
+      en: "Human",
+      fr: "Humain",
+      es: "Humano",
+      zh: "人类",
+      ko: "인간용",
     },
-    { id: "pet_wear", name: "ペット服 (Pet CAD)", sub: "小型〜大型犬対応" },
-    { id: "cos_form", name: "コスプレ・造形", sub: "サーキュラー・EVA展開図" },
-    { id: "free_draw", name: "完全自由描画", sub: "点・ベジエ曲線・直線" },
-  ];
+    doll: {
+      ja: "ドール",
+      en: "Doll",
+      fr: "Poupée",
+      es: "Muñeca",
+      zh: "娃娃",
+      ko: "인형",
+    },
+    pet: {
+      ja: "ペット",
+      en: "Pet",
+      fr: "Animal",
+      es: "Mascota",
+      zh: "宠物",
+      ko: "반려동물",
+    },
+    cosplay: {
+      ja: "コスプレ",
+      en: "Cosplay",
+      fr: "Cosplay",
+      es: "Cosplay",
+      zh: "角色扮演",
+      ko: "코스프레",
+    },
+  };
+
+  // 言語ごとのタブ名リスト（全言語完全対応）
+  const tabLabels: Record<string, Record<string, string>> = {
+    canvas2d: {
+      ja: "Canvas 2D",
+      en: "Canvas 2D",
+      fr: "Canvas 2D",
+      es: "Canvas 2D",
+      zh: "二维画布",
+      ko: "2D 캔버스",
+    },
+    simulation3d: {
+      ja: "3D 着せ替え",
+      en: "3D Simulation",
+      fr: "Simulation 3D",
+      es: "Simulación 3D",
+      zh: "3D 试衣",
+      ko: "3D 피팅",
+    },
+    nesting: {
+      ja: "自動ネスティング",
+      en: "Auto Nesting",
+      fr: "Imbrication auto",
+      es: "Anidamiento",
+      zh: "自动排料",
+      ko: "자동 네스팅",
+    },
+    specsheet: {
+      ja: "仕様書レシピ",
+      en: "Spec Sheet",
+      fr: "Fiche technique",
+      es: "Hoja de especificaciones",
+      zh: "规格说明书",
+      ko: "사양서 레시피",
+    },
+    dxf: {
+      ja: "DXF CAD入出力",
+      en: "DXF CAD I/O",
+      fr: "E/S DXF CAD",
+      es: "E/S DXF CAD",
+      zh: "DXF CAD 输入输出",
+      ko: "DXF CAD 입출력",
+    },
+    pdf: {
+      ja: "PDF 実物大印刷",
+      en: "PDF Print",
+      fr: "Impression PDF",
+      es: "Impresión PDF",
+      zh: "PDF 实物打印",
+      ko: "PDF 실물 인쇄",
+    },
+  };
+
+  // パラメータコントロールのタイトル
+  const parameterControlsTitle =
+    {
+      ja: "パラメータコントロール",
+      en: "Parameter Controls",
+      fr: "Contrôles des paramètres",
+      es: "Controles de parámetros",
+      zh: "参数控制",
+      ko: "매개변수 제어",
+    }[locale] || "Parameter Controls";
 
   return (
-    <div className="w-full h-screen flex flex-col bg-[#0b0f19] text-slate-200 overflow-hidden font-sans select-none">
-      {/* ==========================================
-          🎬 映画館風ヘッダー ＆ ゴールドアクセント
-          ========================================== */}
-      <header className="bg-[#111827] border-b border-[#374151] px-6 py-3 flex items-center justify-between shadow-2xl z-20 flex-shrink-0">
-        <div className="flex items-center gap-6 overflow-x-auto">
-          <div className="flex items-center gap-3">
-            <span className="bg-gradient-to-r from-amber-400 to-amber-600 text-[#0b0f19] font-extrabold text-xs px-2.5 py-1 rounded shadow-md tracking-wider">
-              小田原ミシン
-            </span>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-amber-400 tracking-widest uppercase">
-                Odawara Sewing Cinema CAD
-              </span>
-              <span className="text-[9px] text-slate-400">
-                World's #1 Professional Suite
-              </span>
-            </div>
-          </div>
-          <nav className="flex items-center gap-1.5 pl-4 border-l border-slate-700">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => store.setActiveModule(tab.id)}
-                className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
-                  activeModule === tab.id
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-[#0b0f19] font-bold shadow-[0_0_15px_rgba(245,158,11,,0.4)]"
-                    : "text-slate-300 hover:bg-[#1f2937] hover:text-amber-300"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+    <div className="w-screen h-screen bg-[#0b0f19] text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-[#0b0f19] overflow-hidden m-0 p-0 box-border">
+      {/* ================= ヘッダーコントロール ================= */}
+      <HeaderControls />
 
-      {/* ==========================================
-          🎥 メインレイアウト（ダークサイドバー ＋ シアタービューポート）
-          ========================================== */}
-      <div className="flex-1 flex flex-row overflow-hidden bg-[#0d1322]">
-        {/* サイドバーコントロールパネル */}
-        <aside className="w-72 min-w-[280px] h-full bg-[#111827] border-r border-[#1f2937] p-5 flex flex-col gap-6 overflow-y-auto flex-shrink-0 shadow-2xl z-10">
-          {/* 5か国語言語切替 */}
-          <div>
-            <span className="text-[10px] uppercase font-bold text-amber-400/80 block mb-2 tracking-widest">
-              🌐 Language / 言語設定
-            </span>
-            <select
-              value={locale}
-              onChange={(e) => store.setLocale(e.target.value)}
-              className="w-full text-xs font-medium border border-slate-700 rounded-md p-2.5 bg-[#1f2937] text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
-            >
-              <option value="ja">日本語 (Japanese)</option>
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-              <option value="de">Deutsch</option>
-            </select>
-          </div>
-
-          {/* 初心者 / プロモード切替 */}
-          <div className="border-t border-[#1f2937] pt-5">
-            <span className="text-[10px] uppercase font-bold text-amber-400/80 block mb-2 tracking-widest">
-              ⭐ User Mode / モード切替
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => store.setUserMode("beginner")}
-                className={`px-3 py-2 text-xs font-semibold rounded-md border transition-all ${
-                  userMode === "beginner"
-                    ? "bg-amber-500 text-[#0b0f19] border-amber-400 font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]"
-                    : "bg-[#1f2937] text-slate-300 border-slate-700 hover:bg-[#374151]"
-                }`}
+      {/* ================= メインコンテンツエリア ================= */}
+      <main className="flex-1 flex flex-row w-full h-[calc(100vh-4rem-2rem)] overflow-hidden p-3 gap-3">
+        {/* 左側：サイドバー */}
+        <aside className="w-[380px] flex-shrink-0 h-full overflow-y-auto bg-[#111827]/90 backdrop-blur rounded-2xl p-4 border border-[#1f2937] shadow-xl flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-[#1f2937] pb-3 px-1 sticky top-0 bg-[#111827]/95 z-10">
+            <h2 className="text-xs font-black text-amber-400 uppercase tracking-widest">
+              ⚙️ {parameterControlsTitle}
+            </h2>
+            <div className="flex items-center gap-2">
+              {/* カテゴリー切替セレクトボックス */}
+              <select
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value)}
+                className="bg-[#161e2e] text-slate-200 text-[11px] px-2 py-1 rounded-md border border-[#1f2937] outline-none cursor-pointer focus:border-amber-500"
               >
-                初心者 (Beginner)
-              </button>
-              <button
-                onClick={() => store.setUserMode("pro")}
-                className={`px-3 py-2 text-xs font-semibold rounded-md border transition-all ${
-                  userMode === "pro"
-                    ? "bg-amber-500 text-[#0b0f19] border-amber-400 font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]"
-                    : "bg-[#1f2937] text-slate-300 border-slate-700 hover:bg-[#374151]"
-                }`}
-              >
-                プロ (Pro)
-              </button>
+                <option value="human">
+                  👗 {categoryLabels.human[locale] || categoryLabels.human.en}
+                </option>
+                <option value="doll">
+                  🧸 {categoryLabels.doll[locale] || categoryLabels.doll.en}
+                </option>
+                <option value="pet">
+                  🐾 {categoryLabels.pet[locale] || categoryLabels.pet.en}
+                </option>
+                <option value="cosplay">
+                  ✨{" "}
+                  {categoryLabels.cosplay[locale] || categoryLabels.cosplay.en}
+                </option>
+              </select>
             </div>
           </div>
 
-          {/* 単位系グローバル切り替え (mm / cm / inch) */}
-          <div className="border-t border-[#1f2937] pt-5">
-            <span className="text-[10px] uppercase font-bold text-amber-400/80 block mb-2 tracking-widest">
-              📏 Unit System / 単位系
-            </span>
-            <div className="grid grid-cols-3 gap-1.5">
-              {(["mm", "cm", "inch"] as const).map((unit) => (
-                <button
-                  key={unit}
-                  onClick={() => store.setUnitSystem(unit)}
-                  className={`py-2 text-xs font-bold rounded-md border transition-all ${
-                    unitSystem === unit
-                      ? "bg-amber-500 text-[#0b0f19] border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
-                      : "bg-[#1f2937] text-slate-300 border-slate-700 hover:bg-[#374151]"
-                  }`}
-                >
-                  {unit.toUpperCase()}
-                </button>
-              ))}
-            </div>
+          <div className="flex flex-col gap-6">
+            <MeasurementPanel />
+            <FabricStretchPanel />
+            <SewingModePanel />
           </div>
         </aside>
 
-        {/* メインビューポート（シアター風ステージ） */}
-        <main className="flex-1 flex flex-col overflow-y-auto p-5 gap-5 bg-[#0b0f19]">
-          {/* カテゴリ選択バー */}
-          <div className="bg-[#111827] rounded-xl p-3.5 shadow-xl border border-[#1f2937] flex items-center gap-3 overflow-x-auto flex-shrink-0">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => store.setActiveCategory(cat.id)}
-                className={`flex flex-col items-start px-3.5 py-2.5 rounded-lg border text-left transition-all min-w-[160px] ${
-                  store.activeCategory === cat.id
-                    ? "border-amber-500 bg-amber-500/10 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
-                    : "border-[#1f2937] bg-[#1f2937]/50 hover:border-slate-600"
-                }`}
-              >
-                <span
-                  className={`text-xs font-bold ${store.activeCategory === cat.id ? "text-amber-400" : "text-slate-200"}`}
+        {/* 右側：メイン作業エリア */}
+        <section className="flex-1 flex flex-col h-full min-w-0 gap-2 overflow-hidden">
+          {/* タブ切り替えバー */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-[#1f2937] bg-[#111827]/60 p-2 rounded-xl shadow-md flex-shrink-0">
+            {[
+              { id: "canvas2d", icon: "📐" },
+              { id: "simulation3d", icon: "🌐" },
+              { id: "nesting", icon: "📦" },
+              { id: "specsheet", icon: "📜" },
+              { id: "dxf", icon: "🗂️" },
+              { id: "pdf", icon: "🖨️" },
+            ].map((tab) => {
+              const labelText =
+                tabLabels[tab.id]?.[locale] || tabLabels[tab.id]?.en || tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap border ${
+                    activeTab === tab.id
+                      ? "bg-amber-500/10 text-amber-400 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+                      : "bg-[#111827] text-slate-400 border-[#1f2937] hover:text-slate-200 hover:border-slate-700"
+                  }`}
                 >
-                  {cat.name}
-                </span>
-                <span className="text-[10px] text-slate-400 mt-0.5">
-                  {cat.sub}
-                </span>
-              </button>
-            ))}
+                  {tab.icon} {labelText}
+                </button>
+              );
+            })}
           </div>
 
-          {/* 中央シネマティックキャンバスエリア */}
-          <div className="flex-1 bg-[#111827] rounded-2xl shadow-2xl border border-[#1f2937] overflow-hidden flex flex-col min-h-[500px]">
-            <div className="px-5 py-3 border-b border-[#1f2937] bg-[#161e2e] flex items-center justify-between text-xs text-slate-300 font-medium">
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                Theater Viewport :{" "}
-                <strong className="text-amber-400">{activeModule}</strong>
-              </span>
-              <span className="text-[10px] bg-[#1f2937] text-amber-300/90 px-2.5 py-1 rounded-md border border-slate-700">
-                Active Category: {store.activeCategory}
-              </span>
-            </div>
-
-            <div className="flex-1 relative flex items-center justify-center p-6 bg-gradient-to-b from-[#111827] to-[#0b0f19]">
-              {activeModule === "tabCanvas2D" ? (
-                <Canvas2DView />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-slate-400 gap-3 p-8 text-center">
-                  <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg">
-                    シネマティック・モジュール：{activeModule}
-                  </span>
-                  <p className="text-xs text-slate-400 max-w-md">
-                    小田原ミシンのゴールドの世界観を反映した専用ステージです。機能の神経回路と完全に同期しています。
-                  </p>
-                  <button
-                    onClick={() => store.setActiveModule("tabCanvas2D")}
-                    className="mt-3 text-xs bg-gradient-to-r from-amber-500 to-amber-600 text-[#0b0f19] font-bold px-5 py-2.5 rounded-lg hover:from-amber-400 hover:to-amber-500 shadow-lg transition-all"
-                  >
-                    Canvas 2D シアターに戻る
-                  </button>
-                </div>
-              )}
+          {/* ビュー表示コンテナ */}
+          <div className="flex-1 w-full h-full bg-[#111827]/40 border border-[#1f2937] rounded-2xl p-3 shadow-inner overflow-hidden flex flex-col relative">
+            <div className="absolute inset-3 overflow-auto">
+              {activeTab === "canvas2d" && <Canvas2DView />}
+              {activeTab === "simulation3d" && <Simulation3DView />}
+              {activeTab === "nesting" && <NestingView />}
+              {activeTab === "specsheet" && <SpecSheetView />}
+              {activeTab === "dxf" && <DxfExporterView />}
+              {activeTab === "pdf" && <PdfGeneratorView />}
             </div>
           </div>
-        </main>
-      </div>
+        </section>
+      </main>
+
+      {/* ================= フッター ================= */}
+      <footer className="h-8 bg-[#111827] border-t border-[#1f2937] px-6 flex items-center justify-between text-[10px] text-slate-500 flex-shrink-0">
+        <div>
+          © 2026 小田原ミシン (Odawara Sewing Machine Store) - All Rights
+          Reserved.
+        </div>
+        <div className="flex items-center gap-4">
+          <span>GitHub: jun483/pattern-cad-app</span>
+          <span className="text-amber-400 font-semibold">
+            Cinematic Dark Mode Active
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,0 +1,55 @@
+// src/i18n/ko.ts
+export const ko = {
+  appName: "오다와라 미싱 프로페셔널 스위트",
+  tagline: "세계 최고의 양재 CAD 시스템",
+  modules: {
+    canvas2D: "캔버스 2D / 자유 드로잉",
+    simulation3D: "3D 시뮬레이션 및 가상 피팅",
+    nesting: "자동 네스팅 (배치)",
+    specSheet: "사양서 및 봉제 레시피",
+    dxfExporter: "DXF 입출력 (CAD)",
+    pdfGenerator: "PDF 인쇄 및 내보내기",
+  },
+  modes: {
+    beginner: "초보자 모드",
+    pro: "전문가 모드 (Pro)",
+  },
+  units: {
+    mm: "밀리미터 (mm)",
+    cm: "센티미터 (cm)",
+    inch: "인치 (inch)",
+  },
+  categories: {
+    menShirt: "의류용 (인간)",
+    dollDress: "인형 옷 (Doll CAD)",
+    petWear: "반려동물 옷 (Pet CAD)",
+    cosForm: "코스프레 의상",
+    freeDraw: "완전자유 드로잉",
+  },
+  panels: {
+    parameterControls: "파라미터 컨트롤",
+    realtimeSync: "실시간 연동",
+    measurementTitle: "치수 및 사이즈 설정",
+    bust: "가슴둘레",
+    waist: "허리둘레",
+    hip: "엉덩이둘레",
+    height: "신장",
+    fabricStretchTitle: "원단 물성 및 스트레치 시뮬레이터",
+    horizontalStretch: "가로 신축률",
+    verticalStretch: "세로 신축률",
+    sewingModeTitle: "공업용·가정용 미싱 설정",
+    currentMode: "현재 모드",
+    industrial: "공업용",
+    home: "가정용",
+  },
+  subviews: {
+    canvas2DTitle: "캔버스 2D / 자유 드로잉 영역",
+    beginnerGuideActive: "초보자 가이드가 포함된 패턴 제도",
+    beginnerGuideDesc:
+      "현재 가슴 및 허리 치수 데이터를 바탕으로 문화식 원형 및 파츠의 외곽선을 실시간으로 자동 계산하고 그려줍니다.",
+    generatePattern: "패턴 자동 생성 실행",
+    reset: "치수 초기화",
+    specSheetTitle: "사양서 및 봉제 레시피 자동 생성",
+    pdfDownload: "PDF 형식으로 다운로드",
+  },
+};

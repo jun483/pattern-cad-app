@@ -1,0 +1,55 @@
+// src/i18n/ja.ts
+export const ja = {
+  appName: "小田原ミシン Professional Suite",
+  tagline: "世界一の洋裁CADシステム",
+  modules: {
+    canvas2D: "Canvas 2D / 自由描画",
+    simulation3D: "3D シミュレーション・着せ替え",
+    nesting: "自動ネスティング",
+    specSheet: "仕様書・縫製レシピ",
+    dxfExporter: "DXF 入出力 (CAD)",
+    pdfGenerator: "PDF 印刷・エクスポート",
+  },
+  modes: {
+    beginner: "初心者 (Beginner)",
+    pro: "プロ (Pro)",
+  },
+  units: {
+    mm: "ミリ (mm)",
+    cm: "センチ (cm)",
+    inch: "インチ (inch)",
+  },
+  categories: {
+    menShirt: "人間用アパレル",
+    dollDress: "ドール服 (Doll CAD)",
+    petWear: "ペット服 (Pet CAD)",
+    cosForm: "コスプレ・造形",
+    freeDraw: "完全自由描画",
+  },
+  panels: {
+    parameterControls: "パラメータコントロール",
+    realtimeSync: "リアルタイム連動",
+    measurementTitle: "寸法・サイズ設定",
+    bust: "バスト",
+    waist: "ウエスト",
+    hip: "ヒップ",
+    height: "身長",
+    fabricStretchTitle: "生地物性・ストレッチシミュレーター",
+    horizontalStretch: "横方向伸縮率",
+    verticalStretch: "縦方向伸縮率",
+    sewingModeTitle: "工業用・家庭用ミシン設定",
+    currentMode: "現在のモード",
+    industrial: "工業用",
+    home: "家庭用",
+  },
+  subviews: {
+    canvas2DTitle: "キャンバス 2D / 自由描画エリア",
+    beginnerGuideActive: "初心者ガイド付きパターン作図",
+    beginnerGuideDesc:
+      "現在のバスト・ウエストの寸法データに基づき、文化式原型およびパーツの輪郭をリアルタイムで自動計算・描画しています。",
+    generatePattern: "パターン自動生成を実行",
+    reset: "寸法リセット",
+    specSheetTitle: "仕様書・縫製レシピ自動生成",
+    pdfDownload: "PDF形式でダウンロード",
+  },
+};

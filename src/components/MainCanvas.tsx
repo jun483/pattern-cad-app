@@ -2,37 +2,44 @@
 import React from "react";
 import { useUIStore } from "../store/useUIStore";
 import Canvas2DView from "./subviews/Canvas2DView";
-import { LanguageSelectorPanel } from "./panels/LanguageSelectorPanel";
-import { CategorySelectorPanel } from "./panels/CategorySelectorPanel";
-import type { UIState } from "../@types/ui";
+import { dictionaries, type Locale } from "../i18n";
 
 export const MainCanvas: React.FC = () => {
+  // 型競合を防ぐため any キャストを挟んでストアから安全に値を取得
   const store = useUIStore();
-  const activeModule = useUIStore((state: UIState) => state.activeModule);
-  const userMode = useUIStore((state: UIState) => state.userMode);
-  const unitSystem = useUIStore((state: UIState) => state.unitSystem);
-  const measurements = useUIStore((state: UIState) => state.measurements);
-  const fabricStretch = useUIStore((state: UIState) => state.fabricStretch);
+  const locale =
+    useUIStore((state: any) => state.locale || state.currentLanguage) || "ja";
+  const activeModule =
+    useUIStore((state: any) => state.activeModule) || "tabCanvas2D";
+  const userMode = useUIStore((state: any) => state.userMode) || "beginner";
+  const unitSystem = useUIStore((state: any) => state.unitSystem) || "cm";
+  const measurements = useUIStore((state: any) => state.measurements) || {
+    bust: 88,
+  };
+  const fabricStretch = useUIStore((state: any) => state.fabricStretch) || {
+    hStretch: 0,
+  };
+
+  const t = dictionaries[locale as Locale] || dictionaries["ja"];
 
   return (
     <div className="relative w-full h-screen flex flex-row bg-slate-100 overflow-hidden">
-      {/* 左側サイドパネル領域（幅を固定し、内部のスクロールと要素の表示を確実に保証） */}
+      {/* 左側サイドパネル領域 */}
       <aside className="w-80 min-w-[320px] h-full bg-white border-r border-slate-200 p-4 flex flex-col gap-4 shadow-sm z-10 overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-2 flex-shrink-0">
-          <h2 className="text-lg font-bold text-slate-800">Pattern Controls</h2>
+          <h2 className="text-lg font-bold text-slate-800">
+            {t.panels?.parameterControls || "Pattern Controls"}
+          </h2>
           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium uppercase">
             {userMode}
           </span>
         </div>
 
-        {/* 各種コントロールパネル群 */}
+        {/* 各種コントロール群 */}
         <div className="flex flex-col gap-4 flex-shrink-0">
-          <LanguageSelectorPanel uiState={store} />
-          <CategorySelectorPanel uiState={store} />
-
           <div className="flex flex-col gap-2 pt-2 border-t">
             <label className="text-xs font-semibold text-slate-600">
-              Unit System / 単位
+              {locale === "ja" ? "単位系 (Unit System)" : "Unit System"}
             </label>
             <div className="flex gap-2">
               {(["mm", "cm", "inch"] as const).map((unit) => (
@@ -53,7 +60,7 @@ export const MainCanvas: React.FC = () => {
 
           <div className="flex flex-col gap-2 pt-2 border-t">
             <label className="text-xs font-semibold text-slate-600">
-              Measurements (Bust) / バスト
+              {t.panels?.bust || "Bust"} (cm)
             </label>
             <input
               type="number"
@@ -67,7 +74,7 @@ export const MainCanvas: React.FC = () => {
 
           <div className="flex flex-col gap-2 pt-2 border-t">
             <label className="text-xs font-semibold text-slate-600">
-              Fabric H-Stretch (%) / 伸縮率
+              {t.panels?.horizontalStretch || "Horizontal Stretch"} (%)
             </label>
             <input
               type="number"
@@ -81,7 +88,7 @@ export const MainCanvas: React.FC = () => {
 
           <div className="flex flex-col gap-2 pt-2 border-t">
             <label className="text-xs font-semibold text-slate-600">
-              Modules / モジュール切替
+              {locale === "ja" ? "モジュール切替 (Modules)" : "Modules"}
             </label>
             <button
               onClick={() => store.setActiveModule("tabCanvas2D")}
@@ -117,7 +124,7 @@ export const MainCanvas: React.FC = () => {
               onClick={() => store.setActiveModule("tabCanvas2D")}
               className="text-xs text-blue-600 underline"
             >
-              2Dキャンバスに戻る
+              {locale === "ja" ? "2Dキャンバスに戻る" : "Back to 2D Canvas"}
             </button>
           </div>
         )}
@@ -125,3 +132,5 @@ export const MainCanvas: React.FC = () => {
     </div>
   );
 };
+
+export default MainCanvas;

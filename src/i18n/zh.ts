@@ -1,0 +1,55 @@
+// src/i18n/zh.ts
+export const zh = {
+  appName: "小田原缝纫机专业套件",
+  tagline: "世界第一的服装CAD系统",
+  modules: {
+    canvas2D: "二维画布 / 自由绘制",
+    simulation3D: "三维模拟与试穿",
+    nesting: "自动排料 (Nesting)",
+    specSheet: "规格书与缝制工艺",
+    dxfExporter: "DXF 导入导出 (CAD)",
+    pdfGenerator: "PDF 打印与导出",
+  },
+  modes: {
+    beginner: "新手模式",
+    pro: "专业模式 (Pro)",
+  },
+  units: {
+    mm: "毫米 (mm)",
+    cm: "厘米 (cm)",
+    inch: "英寸 (inch)",
+  },
+  categories: {
+    menShirt: "成人服装",
+    dollDress: "娃娃服饰 (Doll CAD)",
+    petWear: "宠物服饰 (Pet CAD)",
+    cosForm: "动漫Cosplay造型",
+    freeDraw: "完全自由绘制",
+  },
+  panels: {
+    parameterControls: "参数控制面板",
+    realtimeSync: "实时联动",
+    measurementTitle: "尺寸与规格设定",
+    bust: "胸围",
+    waist: "腰围",
+    hip: "臀围",
+    height: "身高",
+    fabricStretchTitle: "面料物理性能与弹力模拟器",
+    horizontalStretch: "横向弹力伸长率",
+    verticalStretch: "纵向弹力伸长率",
+    sewingModeTitle: "工业缝纫机与家用缝纫机设定",
+    currentMode: "当前模式",
+    industrial: "工业用",
+    home: "家用",
+  },
+  subviews: {
+    canvas2DTitle: "二维画布 / 自由绘制区域",
+    beginnerGuideActive: "新手引导式纸样制图",
+    beginnerGuideDesc:
+      "基于当前胸围和腰围尺寸数据，系统实时自动计算并绘制文化式原型及各部件轮廓。",
+    generatePattern: "执行纸样自动生成",
+    reset: "重置尺寸",
+    specSheetTitle: "自动生成规格书与缝制说明",
+    pdfDownload: "以 PDF 格式下载",
+  },
+};

@@ -1,5 +1,8 @@
+// src/store/useUIStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { dictionaries } from "../i18n";
+import type { Language } from "../i18n"; // ← ここを `import type` に変更しました
 
 export type ModuleId =
   | "tabCanvas2D"
@@ -11,8 +14,8 @@ export type ModuleId =
 
 export type UserMode = "beginner" | "pro";
 export type UnitSystem = "mm" | "cm" | "inch";
-export type Locale = "ja" | "en" | "fr" | "es" | "de";
-export type SewingMachineType = "home" | "industrial"; // 家庭用 vs 工業用 (JUKI等)
+export type Locale = Language;
+export type SewingMachineType = "home" | "industrial";
 
 export interface Measurements {
   bust: number;
@@ -20,13 +23,12 @@ export interface Measurements {
   hip: number;
   backLength?: number;
   shoulderWidth?: number;
-  // 将来の拡張用オプショナルフィールド
   customExtras?: Record<string, number>;
 }
 
 export interface FabricStretch {
-  hStretch: number; // 横方向伸縮率 (%)
-  vStretch: number; // 縦方向伸縮率 (%)
+  hStretch: number;
+  vStretch: number;
 }
 
 export interface UIState {
@@ -35,11 +37,11 @@ export interface UIState {
   unitSystem: UnitSystem;
   locale: Locale;
   activeCategory: string;
-  sewingMachineType: SewingMachineType; // 工業・家庭用設定
+  sewingMachineType: SewingMachineType;
   measurements: Measurements;
   fabricStretch: FabricStretch;
+  t: (typeof dictionaries)["ja"];
 
-  // アクション
   setActiveModule: (module: ModuleId) => void;
   setUserMode: (mode: UserMode) => void;
   setUnitSystem: (unit: UnitSystem) => void;
@@ -58,7 +60,8 @@ export const useUIStore = create<UIState>()(
       unitSystem: "cm",
       locale: "ja",
       activeCategory: "men_shirt",
-      sewingMachineType: "home", // デフォルトは家庭用
+      sewingMachineType: "home",
+      t: dictionaries["ja"],
 
       measurements: {
         bust: 88,
@@ -76,7 +79,13 @@ export const useUIStore = create<UIState>()(
       setActiveModule: (module) => set({ activeModule: module }),
       setUserMode: (mode) => set({ userMode: mode }),
       setUnitSystem: (unit) => set({ unitSystem: unit }),
-      setLocale: (locale) => set({ locale }),
+
+      setLocale: (locale) =>
+        set({
+          locale,
+          t: dictionaries[locale] || dictionaries["ja"],
+        }),
+
       setActiveCategory: (category) => set({ activeCategory: category }),
       setSewingMachineType: (type) => set({ sewingMachineType: type }),
 
@@ -91,7 +100,7 @@ export const useUIStore = create<UIState>()(
         })),
     }),
     {
-      name: "odawara-sewing-cad-storage", // ローカルストレージに自動保存され、リロードしても消えません
+      name: "odawara-sewing-cad-storage",
     },
   ),
 );
