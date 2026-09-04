@@ -2,7 +2,7 @@
 import React from "react";
 import { useUIStore } from "../store/useUIStore";
 import { dictionaries } from "../i18n";
-import type { Locale, UnitSystem } from "../store/useUIStore";
+import type { LocaleType, UnitSystemType } from "../store/useUIStore";
 
 export const HeaderControls: React.FC = () => {
   const {
@@ -24,9 +24,11 @@ export const HeaderControls: React.FC = () => {
       {/* アプリタイトル＆タグライン */}
       <div>
         <h1 className="text-lg font-bold text-amber-400 tracking-wide">
-          {t.appName}
+          {t.appName || "小田原ミシン Professional Suite"}
         </h1>
-        <p className="text-xs text-slate-400">{t.tagline}</p>
+        <p className="text-xs text-slate-400">
+          {t.tagline || "次世代の自動CADシステム"}
+        </p>
       </div>
 
       {/* 各種コントロール群 */}
@@ -36,7 +38,7 @@ export const HeaderControls: React.FC = () => {
           <span className="text-slate-400">🌐</span>
           <select
             value={locale}
-            onChange={(e) => setLocale(e.target.value as Locale)}
+            onChange={(e) => setLocale(e.target.value as LocaleType)}
             className="bg-transparent text-amber-300 font-semibold outline-none cursor-pointer"
           >
             <option value="ja" className="bg-[#1f2937] text-white">
@@ -64,33 +66,33 @@ export const HeaderControls: React.FC = () => {
         <div className="flex bg-[#1f2937] p-1 rounded-lg border border-slate-700">
           <button
             onClick={() => setUserMode("beginner")}
-            className={`px-3 py-1 rounded-md transition-all ${
+            className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
               userMode === "beginner"
                 ? "bg-amber-500 text-slate-950 font-bold shadow"
                 : "text-slate-300 hover:text-white"
             }`}
           >
-            {t.modes.beginner}
+            {t.modes?.beginner || "初心者"}
           </button>
           <button
             onClick={() => setUserMode("pro")}
-            className={`px-3 py-1 rounded-md transition-all ${
+            className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
               userMode === "pro"
                 ? "bg-amber-500 text-slate-950 font-bold shadow"
                 : "text-slate-300 hover:text-white"
             }`}
           >
-            {t.modes.pro}
+            {t.modes?.pro || "プロ (Pro)"}
           </button>
         </div>
 
         {/* 3. 📏 単位系切替（mm / cm / inch） */}
         <div className="flex bg-[#1f2937] p-1 rounded-lg border border-slate-700">
-          {(["mm", "cm", "inch"] as UnitSystem[]).map((unit) => (
+          {(["mm", "cm", "inch"] as UnitSystemType[]).map((unit) => (
             <button
               key={unit}
               onClick={() => setUnitSystem(unit)}
-              className={`px-2.5 py-1 rounded-md transition-all uppercase ${
+              className={`px-2.5 py-1 rounded-md transition-all uppercase cursor-pointer ${
                 unitSystem === unit
                   ? "bg-blue-600 text-white font-bold"
                   : "text-slate-400 hover:text-white"
@@ -105,26 +107,28 @@ export const HeaderControls: React.FC = () => {
         <div className="flex bg-[#1f2937] p-1 rounded-lg border border-slate-700">
           <button
             onClick={() => setSewingMachineType("home")}
-            className={`px-3 py-1 rounded-md transition-all ${
+            className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
               sewingMachineType === "home"
                 ? "bg-emerald-600 text-white font-bold"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            {t.panels.home}
+            {t.panels?.home || "家庭用"}
           </button>
           <button
             onClick={() => setSewingMachineType("industrial")}
-            className={`px-3 py-1 rounded-md transition-all ${
+            className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
               sewingMachineType === "industrial"
                 ? "bg-emerald-600 text-white font-bold"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            {t.panels.industrial}
+            {t.panels?.industrial || "工業用"}
           </button>
         </div>
       </div>
     </header>
   );
 };
+
+export default HeaderControls;

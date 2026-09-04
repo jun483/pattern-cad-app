@@ -4,9 +4,14 @@ import { useUIStore } from "../../store/useUIStore";
 
 export const Simulation3DView: React.FC = () => {
   const activeCategory = useUIStore((state) => state.activeCategory);
-  const fabricStretch = useUIStore((state) => state.fabricStretch);
+const fabric = useUIStore((state) => state.fabric);
+// 横方向または縦方向の伸縮率を利用する場合
+const fabricStretch = fabric.stretchH;
   const locale = useUIStore((state) => state.locale);
 
+  // 安全にストレッチ値を取り出すためのデフォルト値フォールバック
+const hStretch = fabric.stretchH;
+const vStretch = fabric.stretchV;
   // 言語ごとのテキスト定義
   const labels = {
     ja: {
@@ -91,8 +96,8 @@ export const Simulation3DView: React.FC = () => {
           <span className="text-slate-400">{tText.physics}</span>
           <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded font-semibold">
             {locale === "en"
-              ? `H: ${fabricStretch.hStretch}% / V: ${fabricStretch.vStretch}%`
-              : `横 ${fabricStretch.hStretch}% / 縦 ${fabricStretch.vStretch}%`}
+              ? `H: ${hStretch}% / V: ${vStretch}%`
+              : `横 ${hStretch}% / 縦 ${vStretch}%`}
           </span>
         </div>
       </div>

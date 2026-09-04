@@ -1,7 +1,9 @@
 // src/App.tsx
 import { useState } from "react";
 import { useUIStore } from "./store/useUIStore";
-import { dictionaries } from "./i18n";
+
+// ミシン仕様連動フックのインポート
+import { useMachineIntegration } from "./hooks/useMachineIntegration";
 
 // ヘッダーコンポーネントのインポート
 import { HeaderControls } from "./components/HeaderControls";
@@ -20,13 +22,12 @@ import { DxfExporterView } from "./components/subviews/DxfExporterView";
 import { PdfGeneratorView } from "./components/subviews/PdfGeneratorView";
 
 export function App() {
+  // ミシン切り替え（家庭用・工業用）の自動連動を完全有効化
+  useMachineIntegration();
+
   const locale = useUIStore((state) => state.locale) || "ja";
   const activeCategory = useUIStore((state) => state.activeCategory);
   const setActiveCategory = useUIStore((state) => state.setActiveCategory);
-
-  // 現在の言語の辞書を取得（存在しない場合は日本語にフォールバック）
-  const t =
-    dictionaries[locale as keyof typeof dictionaries] || dictionaries["ja"];
 
   // アクティブなタブの状態管理
   const [activeTab, setActiveTab] = useState<string>("canvas2d");
